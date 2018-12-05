@@ -3,7 +3,7 @@ from marshmallow.exceptions import ValidationError
 from flask_filter.filters import *
 
 
-def get_filter_class(operator):
+def _get_filter_class(operator):
     filter_dict = {c.OP: c for c in FILTERS}
     return filter_dict.get(operator)
 
@@ -24,5 +24,5 @@ class FilterSchema(Schema):
         op = json.get("OP")
         field = json.get("field")
         value = json.get("value")
-        Class = get_filter_class(op)
+        Class = _get_filter_class(op)
         return Class(field=field, value=value)

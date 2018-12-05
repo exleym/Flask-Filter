@@ -1,4 +1,4 @@
-from flask_filter.schemas import FilterSchema
+from .schemas import FilterSchema
 
 
 filter_schema = FilterSchema()

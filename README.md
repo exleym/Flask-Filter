@@ -27,12 +27,6 @@ and directly apply the filters using `Filter.apply` to craft a
 SQLAlchemy query with a complex set of filters.
 
 ```python
-from flask import Flask, jsonify, request
-from flask_filter import FilterSchema
-
-from pet_store.schemas import PetSchema
-
-app = Flask(__name__)
 filter_schema = FilterSchema()
 pet_schema = PetSchema()
 
@@ -48,12 +42,7 @@ def pet_search():
 ### Example 2: Automatically filtering using the `query_with_filters` function
 
 ```python
-from flask import Flask, jsonify, request
 from flask_filter import query_with_filters
-
-from pet_store.schemas import PetSchema
-
-app = Flask(__name__)
 pet_schema = PetSchema()
 
 @app.route('/api/v1/pets/search', methods=['POST']

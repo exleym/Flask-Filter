@@ -1,6 +1,11 @@
 # Flask-Filter
 Filtering Extension for Flask / SQLAlchemy
 
+[![Build Status](https://travis-ci.org/exleym/Flask-Filter.svg?branch=master)](https://travis-ci.org/exleym/Flask-Filter)
+
+# Introduction
+TODO: put an introduction here!
+
 
 # Examples
 This section demonstrates a couple use-cases for Flask-Filter

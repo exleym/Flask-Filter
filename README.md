@@ -10,6 +10,26 @@ integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
 extension and [Marshmallow](https://marshmallow.readthedocs.io/en/3.0/),
 a popular serialization library.
 
+# Default Filters
+Out-of-the box, `Flask-Filter` supports filters as JSON objects with
+the following structure:
+
+```json
+{"field": "field_name", "op": "operator", "value": "some_value"}
+```
+
+The built-in filters support the following operators:
+
+| symbol   | operator                     | python filter class   |
+|----------|------------------------------|-----------------------|
+| <        | less-than                    | `LTFilter`            |
+| <=       | less-than or equal to        | `LTEFilter`           |
+| =        | equal to                     | `EqualsFilter`        |
+| >        | greater-than                 | `GTFilter`            |
+| >=       | greater-than or equal to     | `GTEFilter`           |
+| in       | in                           | `InFilter`            |
+| !=       | not equal to                 | `NotEqualsFilter`     |
+| like     | like                         | `LikeFilter`          |
 
 # Examples
 This section demonstrates simplified use-cases for Flask-Filter. For

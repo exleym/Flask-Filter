@@ -4,11 +4,21 @@ Filtering Extension for Flask / SQLAlchemy
 [![Build Status](https://travis-ci.org/exleym/Flask-Filter.svg?branch=master)](https://travis-ci.org/exleym/Flask-Filter)
 
 # Introduction
-TODO: put an introduction here!
+Flask-Filter is a simple [Flask](http://flask.pocoo.org/) extension for
+standardizing search endpoints for a REST API. It is designed to
+integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
+extension and [Marshmallow](https://marshmallow.readthedocs.io/en/3.0/),
+a popular serialization library.
 
 
 # Examples
-This section demonstrates a couple use-cases for Flask-Filter
+This section demonstrates simplified use-cases for Flask-Filter. For
+a complete example app (a Pet Store API), see the `/example` folder.
+
+Note: examples in this readme define simple `/search` endpoints that
+assume a working Flask app has already been initialized, and other
+required classes have been defined in a `pet_store` directory. To see
+a full implementation, go to `/examples/pet_store`
 
 ### Example 1: Manually implementing filters in a flask view
 Using the `FilterSchema` class directly, you can deserialize an

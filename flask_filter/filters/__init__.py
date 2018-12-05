@@ -1,4 +1,4 @@
-from rc.filters.base_filter import Filter
+from flask_filter.filters.base_filter import Filter
 
 
 class LTFilter(Filter):

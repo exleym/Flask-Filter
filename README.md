@@ -5,9 +5,14 @@ Filtering Extension for Flask / SQLAlchemy
 # Examples
 This section demonstrates a couple use-cases for Flask-Filter
 
+### Example 1: Manually implementing filters in a flask view
+Using the `FilterSchema` class directly, you can deserialize an
+array of JSON filters into a list of `flask_filter.Filter` objects
 ```python
 from flask import Flask, jsonify, request
-from flask_filter import apply_filters
+from flask_filter import FilterSchema
+
+from pet_store.schemas import PetSchema
 
 app = Flask(__name__)
 filter_schema = FilterSchema()

@@ -70,3 +70,23 @@ def pet_search():
     pets = query_with_filters(Pet, request.json.get("filters"), PetSchema)
     return jsonify(pet_schema.dump(pets)), 200
 ```
+
+
+### Example 3: Initializing and using the Flask extension object
+
+```python
+from flask import Flask
+
+from pet_store import Pet, PetSchema  # Model defined as subclass of `db.Model`
+from pet_store.extensions import db, filter  # SQLAlchemy and FlaskFilter objects
+
+app = Flask(__name__)
+db.init_app(app)
+flask_filter.init_app(app)
+
+
+@app.route('/api/v1/pets/search', methods=['POST']
+def pet_search():
+    pets = filter.search(Pet, PetSchema, request.json.get("filters"))
+    return jsonify(pet_schema.dump(pets)), 200
+```

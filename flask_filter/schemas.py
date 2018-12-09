@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, post_load
 from marshmallow.exceptions import ValidationError
-from flask_filter.filters import *
+from flask_filter.filters import FILTERS
 
 
 def _get_filter_class(operator):

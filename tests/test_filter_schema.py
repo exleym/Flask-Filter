@@ -1,6 +1,6 @@
 import unittest
 
-from flask_filter import FilterSchema
+from flask_filter.schemas import FilterSchema
 from flask_filter.filters import *
 
 

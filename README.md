@@ -78,15 +78,29 @@ def pet_search():
 from flask import Flask
 
 from pet_store import Pet, PetSchema  # Model defined as subclass of `db.Model`
-from pet_store.extensions import db, filter  # SQLAlchemy and FlaskFilter objects
+from pet_store.extensions import db, filtr  # SQLAlchemy and FlaskFilter objects
 
 app = Flask(__name__)
 db.init_app(app)
-flask_filter.init_app(app)
+filtr.init_app(app)
 
 
 @app.route('/api/v1/pets/search', methods=['POST']
 def pet_search():
-    pets = filter.search(Pet, PetSchema, request.json.get("filters"))
+    pets = filtr.search(Pet, request.json.get("filters"), PetSchema)
     return jsonify(pet_schema.dump(pets)), 200
+```
+
+or alternatively, if you pre-register the Model and Schema with the
+`FlaskFilter` object you do not need to pass the `Schema` directly to
+the `search` method:
+
+```python
+filtr.register_model(Dog, DogSchema)  # Register in the app factory
+```
+
+followed by the search execution (without an explicitly-defined schema):
+
+```python
+pets = filtr.search(Pet, request.json.get("filters"))
 ```

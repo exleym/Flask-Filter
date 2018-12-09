@@ -20,10 +20,6 @@ class FlaskFilter(object):
         self.app = app
 
     def register_model(self, DbModel, ModelSchema):
-        print("\n" + "="*72)
-        print(self.app.extensions)
-        print(type(self.app.extensions))
-        print("=" * 72 + "\n\n")
         self.app.extensions['filter'].update_state(DbModel, ModelSchema)
 
     def search(self, DbModel: Model, filters: list,

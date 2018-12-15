@@ -5,17 +5,22 @@ Filtering Extension for Flask / SQLAlchemy
 
 # Introduction
 Flask-Filter is a simple [Flask](http://flask.pocoo.org/) extension for
-standardizing search endpoints for a REST API. It is designed to
-integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
+standardizing behavior of REST API resource search endpoints. It is
+designed to integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
 extension and [Marshmallow](https://marshmallow.readthedocs.io/en/3.0/),
 a popular serialization library.
 
+Out-of-the-box, Flask-Filter provides search functionality on top-level
+object fields via an array of filter objects provided in the JSON body
+of a POST request. For configuring filtering on derived or nested fields
+see the "Filtering on Nested Fields" section of the documentation.
+
 # Default Filters
-Out-of-the box, `Flask-Filter` supports filters as JSON objects with
-the following structure:
+Flask-Filter supports searching resources based on an array of filters,
+JSON objects with the following structure:
 
 ```json
-{"field": "field_name", "op": "operator", "value": "some_value"}
+{"field": "<field_name>", "op": "<operator>", "value": "<some_value>"}
 ```
 
 The built-in filters support the following operators:
@@ -30,6 +35,11 @@ The built-in filters support the following operators:
 | in       | in                           | `InFilter`            |
 | !=       | not equal to                 | `NotEqualsFilter`     |
 | like     | like                         | `LikeFilter`          |
+
+Note: Be careful with typing around comparator operators. This version
+does not provide rigorous type-checking, which could cause problems for
+a user who submits a search like "find Pets with name greater than
+'Fido'"
 
 # Examples
 This section demonstrates simplified use-cases for Flask-Filter. For

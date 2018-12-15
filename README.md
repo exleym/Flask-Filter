@@ -5,17 +5,22 @@ Filtering Extension for Flask / SQLAlchemy
 
 # Introduction
 Flask-Filter is a simple [Flask](http://flask.pocoo.org/) extension for
-standardizing search endpoints for a REST API. It is designed to
-integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
+standardizing behavior of REST API resource search endpoints. It is
+designed to integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
 extension and [Marshmallow](https://marshmallow.readthedocs.io/en/3.0/),
 a popular serialization library.
 
+Out-of-the-box, Flask-Filter provides search functionality on top-level
+object fields via an array of filter objects provided in the JSON body
+of a POST request. For configuring filtering on derived or nested fields
+see the "Filtering on Nested Fields" section of the documentation.
+
 # Default Filters
-Out-of-the box, `Flask-Filter` supports filters as JSON objects with
-the following structure:
+Flask-Filter supports searching resources based on an array of filters,
+JSON objects with the following structure:
 
 ```json
-{"field": "field_name", "op": "operator", "value": "some_value"}
+{"field": "<field_name>", "op": "<operator>", "value": "<some_value>"}
 ```
 
 The built-in filters support the following operators:
@@ -30,6 +35,11 @@ The built-in filters support the following operators:
 | in       | in                           | `InFilter`            |
 | !=       | not equal to                 | `NotEqualsFilter`     |
 | like     | like                         | `LikeFilter`          |
+
+Note: Be careful with typing around comparator operators. This version
+does not provide rigorous type-checking, which could cause problems for
+a user who submits a search like "find Pets with name greater than
+'Fido'"
 
 # Examples
 This section demonstrates simplified use-cases for Flask-Filter. For
@@ -69,4 +79,38 @@ pet_schema = PetSchema()
 def pet_search():
     pets = query_with_filters(Pet, request.json.get("filters"), PetSchema)
     return jsonify(pet_schema.dump(pets)), 200
+```
+
+
+### Example 3: Initializing and using the Flask extension object
+
+```python
+from flask import Flask
+
+from pet_store import Pet, PetSchema  # Model defined as subclass of `db.Model`
+from pet_store.extensions import db, filtr  # SQLAlchemy and FlaskFilter objects
+
+app = Flask(__name__)
+db.init_app(app)
+filtr.init_app(app)
+
+
+@app.route('/api/v1/pets/search', methods=['POST']
+def pet_search():
+    pets = filtr.search(Pet, request.json.get("filters"), PetSchema)
+    return jsonify(pet_schema.dump(pets)), 200
+```
+
+or alternatively, if you pre-register the Model and Schema with the
+`FlaskFilter` object you do not need to pass the `Schema` directly to
+the `search` method:
+
+```python
+filtr.register_model(Dog, DogSchema)  # Register in the app factory
+```
+
+followed by the search execution (without an explicitly-defined schema):
+
+```python
+pets = filtr.search(Pet, request.json.get("filters"))
 ```

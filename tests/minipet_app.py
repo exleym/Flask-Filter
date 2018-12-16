@@ -12,6 +12,8 @@ filtr = FlaskFilter()
 
 def create_app(env='test'):
     app = Flask('Mini Pet Store')
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
     filtr.init_app(app)
     filtr.register_model(Dog, DogSchema)

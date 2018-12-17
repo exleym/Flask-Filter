@@ -57,7 +57,6 @@ class Filter(abc.ABC):
         return value
 
 
-
 class RelativeComparator(Filter):
 
     def is_valid(self):
@@ -143,7 +142,7 @@ class NotEqualsFilter(Filter):
 
     def is_valid(self):
         try:
-            assert type(self.value) in (str, int)
+            assert type(self.value) in (str, int, datetime.date)
         except AssertionError:
             raise ValidationError(f"{self} requires a string or int value")
 

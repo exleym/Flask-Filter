@@ -142,3 +142,42 @@ class FilterSchemaTestClass(unittest.TestCase):
         self.assertIsInstance(infilter, InFilter)
         self.assertEqual(infilter.value, ["Fido"])
 
+    def test_notequalsfilter_accepts_string(self):
+        json = {"field": "name", "op": "!=", "value": "Fido"}
+        notequalsfilter = self.schema.load(json)
+        self.assertIsInstance(notequalsfilter, NotEqualsFilter)
+
+    def test_notequalsfilter_accepts_int(self):
+        json = {"field": "age", "op": "!=", "value": 10}
+        notequalsfilter = self.schema.load(json)
+        self.assertIsInstance(notequalsfilter, NotEqualsFilter)
+
+    def test_notequalsfilter_accepts_date(self):
+        json = {"field": "name", "op": "!=", "value": date(2018, 12, 16)}
+        notequalsfilter = self.schema.load(json)
+        self.assertIsInstance(notequalsfilter, NotEqualsFilter)
+
+    def test_notequalsfilter_fails_on_float(self):
+        json = {"field": "age", "op": "!=", "value": 10.234}
+        with self.assertRaises(ValidationError):
+            self.schema.load(json)
+
+    def test_likefilter_accepts_strings(self):
+        json = {"field": "name", "op": "like", "value": "Fido%"}
+        likefilter = self.schema.load(json)
+        self.assertIsInstance(likefilter, LikeFilter)
+
+    def test_likefilter_fails_on_int(self):
+        json = {"field": "age", "op": "like", "value": 4}
+        with self.assertRaises(ValidationError):
+            self.schema.load(json)
+
+    def test_likefilter_fails_on_float(self):
+        json = {"field": "age", "op": "like", "value": 4.20}
+        with self.assertRaises(ValidationError):
+            self.schema.load(json)
+
+    def test_likefilter_fails_on_date(self):
+        json = {"field": "dateOfBirth", "op": "like", "value": date(2018, 12, 17)}
+        with self.assertRaises(ValidationError):
+            self.schema.load(json)

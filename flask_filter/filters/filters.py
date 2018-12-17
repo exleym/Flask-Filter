@@ -1,7 +1,13 @@
 import abc
+import datetime
+import re
 
 from typing import Any
+from numbers import Number
 from marshmallow.exceptions import ValidationError
+
+
+RE_DATE = "^([0-9]{4})-([0-9]|1[0-2]|0[1-9])-([1-9]|0[1-9]|1[0-9]|2[1-9]|3[0-1])$"
 
 
 class Filter(abc.ABC):
@@ -9,7 +15,8 @@ class Filter(abc.ABC):
 
     def __init__(self, field: str, value: Any):
         self.field = field
-        self.value = value
+        self.value = self._date_or_value(value)
+        self.is_valid()
 
     def __repr__(self):
         return f"<{type(self).__name__}(field='{self.field}', op='{self.OP}'" \
@@ -25,6 +32,10 @@ class Filter(abc.ABC):
     def apply(self, query, class_, schema):
         raise NotImplementedError('apply is an abstract method')
 
+    @abc.abstractmethod
+    def is_valid(self):
+        raise NotImplementedError('is_valid is an abstract method')
+
     def _get_db_field(self, schema):
         """ private method to convert JSON field to SQL column
 
@@ -38,8 +49,25 @@ class Filter(abc.ABC):
             raise ValidationError("'{}' is not a valid field")
         return attr.attribute or self.field
 
+    def _date_or_value(self, value):
+        if not isinstance(value, str):
+            return value
+        if re.match(RE_DATE, value):
+            return datetime.datetime.strptime(value, "%Y-%m-%d").date()
+        return value
 
-class LTFilter(Filter):
+
+class RelativeComparator(Filter):
+
+    def is_valid(self):
+        try:
+            allowed = (Number, datetime.date, datetime.datetime)
+            assert isinstance(self.value, allowed)
+        except AssertionError:
+            raise ValidationError(f"{self} requires an ordinal value")
+
+
+class LTFilter(RelativeComparator):
     OP = "<"
 
     def apply(self, query, class_, schema=None):
@@ -47,12 +75,28 @@ class LTFilter(Filter):
         return query.filter(getattr(class_, field) < self.value)
 
 
-class LTEFilter(Filter):
+class LTEFilter(RelativeComparator):
     OP = "<="
 
     def apply(self, query, class_, schema=None):
         field = self._get_db_field(schema)
         return query.filter(getattr(class_, field) <= self.value)
+
+
+class GTFilter(RelativeComparator):
+    OP = ">"
+
+    def apply(self, query, class_, schema=None):
+        field = self._get_db_field(schema)
+        return query.filter(getattr(class_, field) > self.value)
+
+
+class GTEFilter(RelativeComparator):
+    OP = ">="
+
+    def apply(self, query, class_, schema=None):
+        field = self._get_db_field(schema)
+        return query.filter(getattr(class_, field) >= self.value)
 
 
 class EqualsFilter(Filter):
@@ -62,29 +106,31 @@ class EqualsFilter(Filter):
         field = self._get_db_field(schema)
         return query.filter(getattr(class_, field) == self.value)
 
-
-class GTFilter(Filter):
-    OP = ">"
-
-    def apply(self, query, class_, schema=None):
-        field = self._get_db_field(schema)
-        return query.filter(getattr(class_, field) > self.value)
-
-
-class GTEFilter(Filter):
-    OP = ">="
-
-    def apply(self, query, class_, schema=None):
-        field = self._get_db_field(schema)
-        return query.filter(getattr(class_, field) >= self.value)
+    def is_valid(self):
+        allowed = (str, int, datetime.date)
+        try:
+            assert isinstance(self.value, allowed)
+        except AssertionError:
+            raise ValidationError(f"{self} requires a string or int value")
 
 
 class InFilter(Filter):
     OP = "in"
 
+    def __init__(self, field: str, value: Any):
+        if isinstance(value, str):
+            value = [value]
+        super().__init__(field, value)
+
     def apply(self, query, class_, schema=None):
         field = self._get_db_field(schema)
-        return query.filter(getattr(class_, field).in_(self.value))
+        return query.filter(getattr(class_, field).in_(list(self.value)))
+
+    def is_valid(self):
+        try:
+            _ = (e for e in self.value)
+        except TypeError:
+            raise ValidationError(f"{self} must be an iterable")
 
 
 class NotEqualsFilter(Filter):
@@ -94,6 +140,12 @@ class NotEqualsFilter(Filter):
         field = self._get_db_field(schema)
         return query.filter(getattr(class_, field) != self.value)
 
+    def is_valid(self):
+        try:
+            assert type(self.value) in (str, int, datetime.date)
+        except AssertionError:
+            raise ValidationError(f"{self} requires a string or int value")
+
 
 class LikeFilter(Filter):
     OP = "like"
@@ -101,3 +153,9 @@ class LikeFilter(Filter):
     def apply(self, query, class_, schema=None):
         field = self._get_db_field(schema)
         return query.filter(getattr(class_, field).like(self.value))
+
+    def is_valid(self):
+        try:
+            assert isinstance(self.value, str)
+        except AssertionError:
+            raise ValidationError(f"{self} requires a string with a wildcard")

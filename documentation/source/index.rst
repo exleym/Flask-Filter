@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Flask-Filter's documentation!
-========================================
+Flask-Filter: A simple search extension
+=======================================
+Flask-Filter provides a simple extension to the Flask web framework that
+provides detailed search functionality for REST APIs.
 
 .. toctree::
    :maxdepth: 2

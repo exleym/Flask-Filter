@@ -12,6 +12,8 @@ provides detailed search functionality for REST APIs.
    :maxdepth: 2
    :caption: Contents:
 
+   documentation/source/tutorial
+
 
 
 Indices and tables

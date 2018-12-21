@@ -8,7 +8,11 @@ rm -rf mydoc
 mkdir mydoc
 cd mydoc
 git clone -b gh-pages https://github.com/exleym/Flask-Filter.git
+cd Flask-Filter
+rm *
 
-cp ../documentation/build/html/* .
-git commit -am "sphinx documentation changes"
+touch .nojekyll
+cp -r ../../documentation/build/html/* .
+git add .
+git commit -m "sphinx documentation changes"
 git push

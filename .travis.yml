@@ -7,7 +7,6 @@ install:
 script:
   - pip install sphinx
   - pytest
-after_success:
   - bash ./publish.sh
 env:
   global:

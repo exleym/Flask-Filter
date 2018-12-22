@@ -7,17 +7,10 @@ install:
 script:
   - pip install sphinx
   - pytest
-  - ./publish.sh
-deploy:
-  provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep-history: true
-  on:
-    branch: gh-pages
 after_success:
   - bash ./publish.sh
 env:
   global:
-  - GH_USER: user
-  - GH_REPO: repository
+  - GH_USER: exleym
+  - GH_REPO: Flask-Filter
+  - GH_TOKEN: $GITHUB_TOKEN

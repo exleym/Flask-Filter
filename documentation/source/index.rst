@@ -8,6 +8,12 @@ Flask-Filter: A simple search extension
 Flask-Filter provides a simple extension to the Flask web framework that
 provides detailed search functionality for REST APIs.
 
+The search functionality turns a JSON list of `Filter` objects of the form
+`{"field": "name", "op": "=", "value": "Fido"}` into chained filters on a
+SQLAlchemy query. By leveraging the great work done by the SQLAlchemy and
+Marshmallow teams, we are able to easily provide a standardized search
+function to REST APIs.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

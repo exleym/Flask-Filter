@@ -18,14 +18,19 @@ mkdir mydoc
 cd mydoc
 #using token clone gh-pages branch
 git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages > /dev/null
+echo "cloned gh-pages branch from ${GH_REPO}"
+echo "Directory looks like:"
 ls -al
 cd gh-pages
+echo "Clearing directory and adding new documentation"
 rm -r *
 touch .nojekyll
 cp -r ../../documentation/build/html/* .
 
 # Commit changes back to GitHub
-git commit -a -m "sphinx documentation changes"
+echo "Beginning publishing stage ..."
+git add .
+git commit -m "sphinx documentation changes"
 git push
 
 echo "Done updating gh-pages\n"

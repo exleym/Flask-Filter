@@ -8,7 +8,9 @@ Flask-Filter is a simple [Flask](http://flask.pocoo.org/) extension for
 standardizing behavior of REST API resource search endpoints. It is
 designed to integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
 extension and [Marshmallow](https://marshmallow.readthedocs.io/en/3.0/),
-a popular serialization library.
+a popular serialization library. Check out our
+[GitHub Pages site](https://exleym.github.io/Flask-Filter/) for the
+full documentation.
 
 Out-of-the-box, Flask-Filter provides search functionality on top-level
 object fields via an array of filter objects provided in the JSON body

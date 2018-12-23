@@ -5,4 +5,11 @@ install:
   - pip install -r requirements.txt
   - pip install -e .
 script:
+  - pip install sphinx
   - pytest
+  - bash ./publish.sh
+env:
+  global:
+  - GH_USER: exleym
+  - GH_REPO: Flask-Filter
+  - GH_TOKEN: $GITHUB_TOKEN

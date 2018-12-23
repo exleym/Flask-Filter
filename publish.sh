@@ -28,19 +28,24 @@ touch .nojekyll
 cp -r ../../documentation/build/html/* .
 
 # Commit changes back to GitHub
-echo "Beginning publishing stage ..."
+if [ -z "$(git status --porcelain)" ]; then
+    # Working directory clean
+    echo "nothing to commit. skipping publish stage"
+else
+    # Uncommitted changes
+    echo "Beginning publishing stage ..."
+    echo "staging files ..."
+    git add  -f .
+    echo "successful"
 
-echo "staging files ..."
-git add  -f .
-echo "successful"
+    echo "committing ..."
+    git commit -m "sphinx documentation changes"
+    echo "successul"
 
-echo "committing ..."
-git commit -m "sphinx documentation changes"
-echo "successul"
-
-echo "pushing to remote repository ..."
-git push -fq origin gh-pages > /dev/null
-echo "successful"
+    echo "pushing to remote repository ..."
+    git push -fq origin gh-pages > /dev/null
+    echo "successful"
+fi
 
 echo "Done updating gh-pages"
 

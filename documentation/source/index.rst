@@ -22,7 +22,7 @@ Welcome to the new age!
    :maxdepth: 2
    :caption: Contents:
 
-   documentation/source/tutorial
+   tutorial
 
 
 

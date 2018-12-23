@@ -29,9 +29,9 @@ cp -r ../../documentation/build/html/* .
 
 # Commit changes back to GitHub
 echo "Beginning publishing stage ..."
-git add .
+git add  -f .
 git commit -m "sphinx documentation changes"
-git push
+git push -fq origin gh-pages > /dev/null
 
 echo "Done updating gh-pages\n"
 

@@ -29,11 +29,20 @@ cp -r ../../documentation/build/html/* .
 
 # Commit changes back to GitHub
 echo "Beginning publishing stage ..."
-git add  -f .
-git commit -m "sphinx documentation changes"
-git push -fq origin gh-pages > /dev/null
 
-echo "Done updating gh-pages\n"
+echo "staging files ..."
+git add  -f .
+echo "successful"
+
+echo "committing ..."
+git commit -m "sphinx documentation changes"
+echo "successul"
+
+echo "pushing to remote repository ..."
+git push -fq origin gh-pages > /dev/null
+echo "successful"
+
+echo "Done updating gh-pages"
 
 else
  echo "Skipped updating gh-pages, because build is not triggered from the master branch."

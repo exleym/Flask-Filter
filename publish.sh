@@ -18,7 +18,8 @@ mkdir mydoc
 cd mydoc
 #using token clone gh-pages branch
 git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages > /dev/null
-cd Flask-Filter
+ls -al
+cd gh-pages
 rm -r *
 touch .nojekyll
 cp -r ../../documentation/build/html/* .

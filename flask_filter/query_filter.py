@@ -8,5 +8,5 @@ def query_with_filters(class_, filters, schema=None):
     _filters = filter_schema.load(filters, many=True)
     query = class_.query
     for f in _filters:
-        f.apply(query, class_, schema)
+        query = f.apply(query, class_, schema)
     return query.all()

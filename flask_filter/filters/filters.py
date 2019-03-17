@@ -23,7 +23,7 @@ class Filter(abc.ABC):
                f", value={self.value})>"
 
     def __eq__(self, other):
-        return isinstance(other, type(self))
+        return hash(self) == hash(other)
 
     def __hash__(self):
         return hash((self.field, self.OP, self.value))

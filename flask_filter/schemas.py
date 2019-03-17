@@ -3,13 +3,16 @@ from marshmallow.exceptions import ValidationError
 from flask_filter.filters import FILTERS
 
 
+__FILTER_MAP = {c.OP: c for c in FILTERS}
+__VALID_OPERATORS = {x.OP for x in FILTERS}
+
+
 def _get_filter_class(operator):
-    filter_dict = {c.OP: c for c in FILTERS}
-    return filter_dict.get(operator)
+    return __FILTER_MAP.get(operator)
 
 
 def vali1date_operator(value):
-    if value not in [x.OP for x in FILTERS]:
+    if value not in __VALID_OPERATORS:
         message = {'op': [f"operator {value} is not supported"]}
         raise ValidationError(message)
 

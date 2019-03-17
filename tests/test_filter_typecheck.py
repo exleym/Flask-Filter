@@ -136,6 +136,12 @@ class FilterSchemaTestClass(unittest.TestCase):
         infilter = self.schema.load(json)
         self.assertIsInstance(infilter, InFilter)
 
+    def test_infilter_raises_typeerror_on_non_iterable(self):
+        dates = date(2019, 3, 17)
+        json = {"field": "dateOfBirth", "op": "in", "value": dates}
+        with self.assertRaises(ValidationError):
+            self.schema.load(json)
+
     def test_infilter_accepts_string_and_converts_to_list(self):
         json = {"field": "name", "op": "in", "value": "Fido"}
         infilter = self.schema.load(json)

@@ -2,6 +2,7 @@
 Filtering Extension for Flask / SQLAlchemy
 
 [![Build Status](https://travis-ci.org/exleym/Flask-Filter.svg?branch=master)](https://travis-ci.org/exleym/Flask-Filter)
+[![Coverage Status](https://coveralls.io/repos/github/exleym/Flask-Filter/badge.svg?branch=master)](https://coveralls.io/github/exleym/Flask-Filter?branch=master)
 
 # Introduction
 Flask-Filter is a simple [Flask](http://flask.pocoo.org/) extension for

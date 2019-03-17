@@ -187,3 +187,8 @@ class FilterSchemaTestClass(unittest.TestCase):
         json = {"field": "dateOfBirth", "op": "like", "value": date(2018, 12, 17)}
         with self.assertRaises(ValidationError):
             self.schema.load(json)
+
+    def test_filter_schema_raises_validationerror_on_bad_op(self):
+        json = {"field": "weight", "op": "ne", "value": 124}
+        with self.assertRaises(ValidationError):
+            self.schema.load(json)

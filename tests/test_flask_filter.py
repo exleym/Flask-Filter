@@ -1,6 +1,7 @@
 import unittest
 from datetime import date
 
+from flask_filter import FlaskFilter
 from tests.minipet_app import create_app, filtr, Dog, DogSchema, db
 
 
@@ -107,3 +108,18 @@ class FlaskFilterTestClass(unittest.TestCase):
         with self.app.app_context():
             skinnyish_dogs = self.filtr.search(Dog, f)
         self.assertEqual(len(skinnyish_dogs), 2)
+
+    def test_flaskfilter_direct_init(self):
+        filtr = FlaskFilter(self.app)
+        f = [{"field": "weight", "op": "<=", "value": 50}]
+        with self.app.app_context():
+            skinnyish_dogs = filtr.search(Dog, f, DogSchema)
+        self.assertEqual(len(skinnyish_dogs), 2)
+
+    def test_flaskfilter_search_limit(self):
+        f = []
+        with self.app.app_context():
+            all_dogs = self.filtr.search(Dog, f)
+            three_dogs = self.filtr.search(Dog, f, limit=3)
+        self.assertEqual(len(all_dogs), 5)
+        self.assertEqual(len(three_dogs), 3)

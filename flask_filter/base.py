@@ -32,7 +32,7 @@ class FlaskFilter(object):
         for f in filters:
             query = f.apply(query, DbModel, schema)
         if limit:
-            query.limit(limit)
+            query = query.limit(limit)
         return query.all()
 
     def _lookup_schema(self, DbModel):

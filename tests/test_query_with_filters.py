@@ -89,3 +89,10 @@ class QueryWithFiltersTestClass(unittest.TestCase):
         with self.app.app_context():
             fatish_dogs = query_with_filters(Dog, f, DogSchema)
         self.assertEqual(len(fatish_dogs), 2)
+
+    def test_registered_schema_against_dob(self):
+        min_date = date(2002, 1, 1).isoformat()
+        f = [{"field": "dateOfBirth", "op": "<", "value": min_date}]
+        with self.app.app_context():
+            old_dogs = query_with_filters(Dog, f, DogSchema)
+        self.assertEqual(len(old_dogs), 3)

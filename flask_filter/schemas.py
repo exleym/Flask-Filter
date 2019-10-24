@@ -23,7 +23,7 @@ class FilterSchema(Schema):
     value = fields.Field(required=True, allow_none=False)
 
     @post_load
-    def make_object(self, json):
+    def make_object(self, json, *args, **kwargs):
         op = json.get("OP")
         field = json.get("field")
         value = json.get("value")

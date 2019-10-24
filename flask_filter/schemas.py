@@ -24,11 +24,6 @@ class FilterSchema(Schema):
 
     @post_load
     def make_object(self, json, *args, **kwargs):
-        if kwargs.pop("many", False):
-            return [
-                self.make_object(j, *args, many=False, **kwargs)
-                for j in json
-            ]
         op = json.get("OP")
         field = json.get("field")
         value = json.get("value")

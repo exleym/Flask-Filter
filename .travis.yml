@@ -15,3 +15,9 @@ env:
   - GH_TOKEN: $GITHUB_TOKEN
 after_success:
   - coveralls
+#deploy:
+#  provider: pypi
+#  user: "__token__"
+#  password: ...
+#  on:
+#    tags: true

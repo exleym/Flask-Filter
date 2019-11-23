@@ -3,8 +3,8 @@ Filtering Extension for Flask / SQLAlchemy
 
 [![Build Status](https://travis-ci.org/exleym/Flask-Filter.svg?branch=master)](https://travis-ci.org/exleym/Flask-Filter)
 [![Coverage Status](https://coveralls.io/repos/github/exleym/Flask-Filter/badge.svg?branch=master)](https://coveralls.io/github/exleym/Flask-Filter?branch=master)
+[![PyPi][pypi-badge]][pypi]
 
-# Introduction
 Flask-Filter is a simple [Flask](http://flask.pocoo.org/) extension for
 standardizing behavior of REST API resource search endpoints. It is
 designed to integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
@@ -17,6 +17,14 @@ Out-of-the-box, Flask-Filter provides search functionality on top-level
 object fields via an array of filter objects provided in the JSON body
 of a POST request. For configuring filtering on derived or nested fields
 see the "Filtering on Nested Fields" section of the documentation.
+
+# Installation
+Flask-Filter is available on [PyPi][pypi]. To use this library, we recommend you 
+install it via pip:
+
+```bash
+(venv)$ pip install flask-filter
+```
 
 # Default Filters
 Flask-Filter supports searching resources based on an array of filters,
@@ -117,3 +125,6 @@ followed by the search execution (without an explicitly-defined schema):
 ```python
 pets = filtr.search(Pet, request.json.get("filters"))
 ```
+
+[pypi-badge]: https://badge.fury.io/py/Flask-Filter.svg
+[pypi]: https://pypi.org/project/Flask-Filter/

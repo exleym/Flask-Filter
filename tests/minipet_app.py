@@ -20,11 +20,20 @@ def create_app(env='test'):
     return app
 
 
+dog_toys = db.Table(
+    "dog_toys",
+    db.Column("dog_id", db.Integer, db.ForeignKey("dog.id")),
+    db.Column("toy_id", db.Integer, db.ForeignKey("toy.id"))
+)
+
+
 class Dog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
     dob = db.Column(db.Date)
     weight = db.Column(db.Float)
+
+    toys = db.relationship("Toy", secondary="dog_toys", backref="dogs")
 
     @property
     def age(self):
@@ -39,3 +48,17 @@ class DogSchema(Schema):
     name = fields.String()
     dateOfBirth = fields.Date(attribute='dob')
     weight = fields.Float()
+    toys = fields.List(fields.Nested("ToySchema"))
+
+
+class Toy(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32), unique=True)
+
+    def __repr__(self):
+        return f"<Toy(id={self.id}, name='{self.name}')>"
+
+
+class ToySchema(Schema):
+    id = fields.Integer()
+    name = fields.String()

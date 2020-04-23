@@ -46,11 +46,19 @@ The built-in filters support the following operators:
 | in       | in                           | `InFilter`            |
 | !=       | not equal to                 | `NotEqualsFilter`     |
 | like     | like                         | `LikeFilter`          |
+| contains | many-to-many associated      | `ContainsFilter`      |
 
 Note: Be careful with typing around comparator operators. This version
 does not provide rigorous type-checking, which could cause problems for
 a user who submits a search like "find Pets with name greater than
 'Fido'"
+
+Many-to-many associations can be searched using the `contains` operator.
+For a Dog object with a many-to-many relationship with "favorite toys" 
+defined as Dog.toys = [Toy(), Toy()], you can set the field to "toys.name",
+the operator to "contains" and the value to "Tennis Ball". This will perform 
+a SQL "any" search on that field / value and return any Dog objects who like 
+tennis balls.
 
 # Examples
 This section demonstrates simplified use-cases for Flask-Filter. For

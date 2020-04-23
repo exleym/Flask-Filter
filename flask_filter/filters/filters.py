@@ -1,5 +1,6 @@
 import abc
 import datetime
+import logging
 import re
 
 from typing import Any
@@ -7,6 +8,7 @@ from numbers import Number
 from marshmallow.exceptions import ValidationError
 
 
+logger = logging.getLogger(__name__)
 RE_DATE = "^([0-9]{4})-([0-9]|1[0-2]|0[1-9])-([1-9]|0[1-9]|1[0-9]|2[1-9]|3[0-1])$"
 
 
@@ -14,7 +16,8 @@ class Filter(abc.ABC):
     OP = None
 
     def __init__(self, field: str, value: Any):
-        self.field = field
+        self.nested = None
+        self.set_field(field)
         self.value = self._date_or_value(value)
         self.is_valid()
 
@@ -27,6 +30,17 @@ class Filter(abc.ABC):
 
     def __hash__(self):
         return hash((self.field, self.OP, self.value))
+
+    def set_field(self, field):
+        f = field.split(".")
+        self.field = f[0]
+        if len(f) == 2:
+            self.nested = f[1]
+        elif len(f) > 2:
+            logger.warning(
+                f"you supplied nested fields {f}. Only one level of nesting "
+                f"is currently supported. ignoring fields {f[2:]}."
+            )
 
     @abc.abstractmethod
     def apply(self, query, class_, schema):
@@ -46,7 +60,7 @@ class Filter(abc.ABC):
             return self.field
         attr = schema._declared_fields.get(self.field)
         if not attr:
-            raise ValidationError("'{}' is not a valid field")
+            raise ValidationError(f"'{attr}' is not a valid field")
         return attr.attribute or self.field
 
     def _date_or_value(self, value):
@@ -159,3 +173,16 @@ class LikeFilter(Filter):
             assert isinstance(self.value, str)
         except AssertionError:
             raise ValidationError(f"{self} requires a string with a wildcard")
+
+
+class ContainsFilter(Filter):
+    OP = "contains"
+
+    def apply(self, query, class_, schema=None):
+        subfield = self.nested or "id"
+        q = {subfield: self.value}
+        field = self._get_db_field(schema)
+        return query.filter(getattr(class_, field).any(**q))
+
+    def is_valid(self):
+        pass

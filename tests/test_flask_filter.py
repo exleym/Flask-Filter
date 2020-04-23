@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 
 from flask_filter import FlaskFilter
-from tests.minipet_app import create_app, filtr, Dog, DogSchema, db
+from tests.minipet_app import create_app, filtr, Dog, DogSchema, db, Toy, ToySchema
 
 
 class FlaskFilterTestClass(unittest.TestCase):
@@ -14,6 +14,8 @@ class FlaskFilterTestClass(unittest.TestCase):
         with self.app.app_context():
             self.db.create_all()
             self.make_dogs()
+            self.make_toys()
+            self.associate_dogs_with_toys()
 
     def tearDown(self):
         with self.app.app_context():
@@ -32,6 +34,29 @@ class FlaskFilterTestClass(unittest.TestCase):
         ]
         self.db.session.add_all(doggos)
         self.db.session.commit()
+
+    def make_toys(self):
+        toys = [
+            Toy(name="Rock"),
+            Toy(name="Tennis Ball"),
+            Toy(name="Knotted Rope"),
+            Toy(name="Kong")
+        ]
+        self.db.session.add_all(toys)
+        self.db.session.commit()
+
+    def associate_dogs_with_toys(self):
+        self.associate("Xocomil", "Rock")
+        self.associate("Xocomil", "Tennis Ball")
+        self.associate("Quick", "Tennis Ball")
+        self.associate("Jinx", "Kong")
+
+    def associate(self, dog_name, toy_name):
+        dog = Dog.query.filter_by(name=dog_name).one()
+        toy = Toy.query.filter_by(name=toy_name).one()
+        dog.toys.append(toy)
+        db.session.add(dog)
+        db.session.commit()
 
     def test_doggos_exist(self):
         with self.app.app_context():
@@ -123,3 +148,9 @@ class FlaskFilterTestClass(unittest.TestCase):
             three_dogs = self.filtr.search(Dog, f, limit=3)
         self.assertEqual(len(all_dogs), 5)
         self.assertEqual(len(three_dogs), 3)
+
+    def test_flaskfilter_contains(self):
+        f = [{"field": "toys.id", "op": "contains", "value": 2}]
+        with self.app.app_context():
+            ball_dogs = self.filtr.search(Dog, f)
+            self.assertEqual(len(ball_dogs), 2)

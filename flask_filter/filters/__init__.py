@@ -6,7 +6,8 @@ from .filters import (
     GTEFilter,
     InFilter,
     NotEqualsFilter,
-    LikeFilter
+    LikeFilter,
+    ContainsFilter
 )
 
 
@@ -18,5 +19,6 @@ FILTERS = [
     GTEFilter,
     InFilter,
     NotEqualsFilter,
-    LikeFilter
+    LikeFilter,
+    ContainsFilter
 ]

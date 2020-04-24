@@ -164,3 +164,53 @@ need for a search endpoint that allows users to query with a
                 raise ValidationError(f"{self} must be an iterable")
 
     FILTERS.append(NotInFilter)
+
+This implementation works fine, but let's look at the similarities
+between what we just wrote and the existing InFilter -- maybe we
+would be better off extending the InFilter to create a more easily
+maintained class:
+
+.. code-block:: python
+
+    class InFilter(Filter):
+        OP = "in"
+
+        def __init__(self, field: str, value: Any):
+            if isinstance(value, str):
+                value = [value]
+            super().__init__(field, value)
+
+        def apply(self, query, class_, schema=None):
+            field = self._get_db_field(schema)
+            return query.filter(
+                getattr(class_, field).in_(list(self.value))
+            )
+
+        def is_valid(self):
+            try:
+                _ = (e for e in self.value)
+            except TypeError:
+                raise ValidationError(f"{self} must be an iterable")
+
+Whoops! There's only a few tiny changes that had to be made to the
+existing InFilter. Looking closely the only things that differ are:
+
+- the class name itself
+- the ``OP`` class variable
+- the filter used in the apply method
+
+This extension could be accomplished much more effectively by
+sub-classing the ``InFilter`` class.
+
+.. code-block:: python
+
+    class NotInFilter(InFilter):
+        OP = "!in"
+
+        def apply(self, query, class_, schema=None):
+            field = self._get_db_field(schema)
+            return query.filter(
+                getattr(class_, field).notin_(list(self.value))
+            )
+
+    FILTERS.append(NotInFilter)

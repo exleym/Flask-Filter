@@ -23,6 +23,7 @@ Welcome to the new age!
    :caption: Contents:
 
    tutorial
+   dev-guide
 
 
 

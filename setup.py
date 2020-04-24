@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='Flask-Filter',
-    version='0.1.0dev3',
+    version='0.1.0dev4',
     author="Exley McCormick",
     author_email="exleym@gmail.com",
     description="A Flask extension for creating standard resource searches",

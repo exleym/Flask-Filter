@@ -2,10 +2,6 @@ Tutorial
 ========
 This will eventually be a tutorial for using Flask-Filter. Woot!
 
-<<<<<<< HEAD
-
-Using the FlaskFilter Extension
--------------------------------
 The best way to use this library (when working with a normal Flask project) is
 to use the ``FlaskFilter`` extension object. Typical use of this object (as
 with all Flask extensions) is to instantiate a singleton object in an
@@ -13,29 +9,22 @@ with all Flask extensions) is to instantiate a singleton object in an
 application factory, and then import the singleton wherever you need to
 perform a filtered search.
 
-=======
-Example 1: The FlaskFilter Extension
-------------------------------------
+
+1. The Flask Extension
+----------------------
 The simplest and most effective way to use this library is through the
 ``FlaskFilter`` extension. Instantiate this object as a singleton and
 register it with the ``Flask`` application object, and you can query
 resources with the ``search`` method from any view.
->>>>>>> ft/docs
 
 .. code-block:: python
 
     from flask import Flask
 
-<<<<<<< HEAD
     # Pet is a Model defined as subclass of db.Model
     # db is a SQLAlchemy and filter is a FlaskFilter object
-    from pet_store import Pet, PetSchema
-=======
-    # Pet Model defined as subclass of `db.Model`
-    from pet_store import Pet, PetSchema
-
     # SQLAlchemy and FlaskFilter objects created as singletons
->>>>>>> ft/docs
+    from pet_store import Pet, PetSchema
     from pet_store.extensions import db, filtr
 
     app = Flask(__name__)
@@ -43,38 +32,30 @@ resources with the ``search`` method from any view.
     filtr.init_app(app)
 
 
-<<<<<<< HEAD
     @app.route('/api/v1/pets/search', methods=['POST'])
     def pet_search():
         pets = filtr.search(Pet, request.json.get("filters"),
                             PetSchema)
-=======
-    @app.route('/api/v1/pets/search', methods=['POST']
-    def pet_search():
-        pets = filtr.search(Pet, request.json.get("filters"), PetSchema)
->>>>>>> ft/docs
         return jsonify(pet_schema.dump(pets)), 200
 
 
-
-<<<<<<< HEAD
-You may also pre-register the Model and Schema with the
-`FlaskFilter` object, in which case you do not need to pass the `Schema`
-directly to the `search` method. This may be useful if you are writing a lot
-of search endpoints, but should usually be unnecessary.
+You can also pre-register your models and schemas with the ``FlaskFilter``
+object, after which you will not need to pass the schema directly to the
+``search()`` method. This feature could be helpful if you are attempting to
+auto-generate CRUD endpoints.
 
 .. code-block:: python
 
-    # Register the model in your application factory (or wherever
-    # you define your models)
+    # Register in the app factory
     filtr.register_model(Dog, DogSchema)
 
-    # Elsewhere in the application, you can search without a schema
-    pets = filtr.search(Pet, request.json.get("filters"))
+    # in some endpoint down the line, you can now search like this:
+    filters = filter_schema.load(request.json.get("filters"))
+    pets = filtr.search(Pet, filters)
 
 
-Ordering the Search Response
-----------------------------
+2. Ordering Responses
+---------------------
 By default, searches return objects ordered on ``id``, ascending. This behavior
 can be customized with the optional ``order_by`` argument.
 
@@ -105,35 +86,19 @@ objects in the response, use a string for the ``order_by`` argument.
         pets = filtr.search(Pet, request.json.get("filters"),
                             PetSchema, order_by=order_by)
         return jsonify(pet_schema.dump(pets)), 200
-=======
-Example 2: Preregistering your Models
--------------------------------------
-You can also pre-register your models and schemas with the ``FlaskFilter``
-object, after which you will not need to pass the schema directly to the
-``search()`` method. This feature could be helpful if you are attempting to
-auto-generate CRUD endpoints.
-
-.. code-block:: python
-
-    # Register in the app factory
-    filtr.register_model(Dog, DogSchema)
-
-    # in some endpoint down the line, you can now search like this:
-    filters = filter_schema.load(request.json.get("filters"))
-    pets = filtr.search(Pet, filters)
 
 
-Example 3: Automatic Code Generation
-------------------------------------
-If you are using Flask-Restplus to build resource-driven APIs, ``Flask-Filter``
+3. Code Generation
+------------------
+If you are using Flask-RestX to build resource-driven APIs, ``Flask-Filter``
 allows you to automatically generate search endpoints and register them
 with your Swagger documentation:
 
 .. note::
 
     Note: this example is built with Flask-RestX and Flask-Accepts
-    to pair Marshmallow directly with Flask-Restplus and avoid the
-    duplication of serializers common with Flask-Restplus.
+    to pair Marshmallow directly with Flask-RestX and avoid the
+    duplication of serializers common with Flask-RestX.
 
 Use a simple search-endpoint factory function like this one to easily
 create search endpoints for all of your resources. Pair this with some
@@ -187,8 +152,8 @@ body.
 .. image:: _static/routes-search.png
 
 
-Example 4: Extending FlaskFilter -- Adding a new Filter
--------------------------------------------------------
+4. Extending FlaskFilter
+------------------------
 There may come a situation where the default filters provided by
 this library do not meet the needs of your application. In this
 event, you can extend the filter set provided by the ``FlaskFilter``
@@ -289,4 +254,3 @@ sub-classing the ``InFilter`` class.
             )
 
     FILTERS.append(NotInFilter)
->>>>>>> ft/docs

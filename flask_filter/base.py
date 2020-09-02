@@ -25,12 +25,14 @@ class FlaskFilter(object):
 
     def search(self, DbModel: Model, filters: list,
                ModelSchema: Union[Schema, None] = None,
-               limit: int = None):
+               limit: int = None, order_by=None):
         filters = self.schema.load(filters, many=True)
         schema = ModelSchema or self._lookup_schema(DbModel)
         query = DbModel.query
         for f in filters:
             query = f.apply(query, DbModel, schema)
+        if order_by:
+            query = query.order_by(order_by)
         if limit:
             query = query.limit(limit)
         return query.all()

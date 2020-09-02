@@ -105,5 +105,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# DS Store
+# OSX Bullshit
 *.DS_Store
+

@@ -4,8 +4,8 @@
 set -e # exit with nonzero exit code if anything fails
 
 
-#if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ]]; then
-if [[ 1 == 1 ]]; then
+if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ]]; then
+#if [[ 1 == 1 ]]; then
 echo "Starting to update gh-pages\n"
 
 # Make static docs with Sphinx-Build and copy it to clean mydoc/

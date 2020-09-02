@@ -35,6 +35,73 @@
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This will eventually be a tutorial for using Flask-Filter. Woot!</p>
+<div class="section" id="using-the-flaskfilter-extension">
+<h2>Using the FlaskFilter Extension<a class="headerlink" href="#using-the-flaskfilter-extension" title="Permalink to this headline">¶</a></h2>
+<p>The best way to use this library (when working with a normal Flask project) is
+to use the <code class="docutils literal notranslate"><span class="pre">FlaskFilter</span></code> extension object. Typical use of this object (as
+with all Flask extensions) is to instantiate a singleton object in an
+<code class="docutils literal notranslate"><span class="pre">extensions.py</span></code> module in your project. Register the extension in your
+application factory, and then import the singleton wherever you need to
+perform a filtered search.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="c1"># Pet is a Model defined as subclass of db.Model</span>
+<span class="c1"># db is a SQLAlchemy and filter is a FlaskFilter object</span>
+<span class="kn">from</span> <span class="nn">pet_store</span> <span class="kn">import</span> <span class="n">Pet</span><span class="p">,</span> <span class="n">PetSchema</span>
+<span class="kn">from</span> <span class="nn">pet_store.extensions</span> <span class="kn">import</span> <span class="n">db</span><span class="p">,</span> <span class="n">filtr</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">filtr</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/api/v1/pets/search&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">pet_search</span><span class="p">():</span>
+    <span class="n">pets</span> <span class="o">=</span> <span class="n">filtr</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">Pet</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filters&quot;</span><span class="p">),</span>
+                        <span class="n">PetSchema</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">pet_schema</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">pets</span><span class="p">)),</span> <span class="mi">200</span>
+</pre></div>
+</div>
+<p>You may also pre-register the Model and Schema with the
+<cite>FlaskFilter</cite> object, in which case you do not need to pass the <cite>Schema</cite>
+directly to the <cite>search</cite> method. This may be useful if you are writing a lot
+of search endpoints, but should usually be unnecessary.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Register the model in your application factory (or wherever</span>
+<span class="c1"># you define your models)</span>
+<span class="n">filtr</span><span class="o">.</span><span class="n">register_model</span><span class="p">(</span><span class="n">Dog</span><span class="p">,</span> <span class="n">DogSchema</span><span class="p">)</span>
+
+<span class="c1"># Elsewhere in the application, you can search without a schema</span>
+<span class="n">pets</span> <span class="o">=</span> <span class="n">filtr</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">Pet</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filters&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ordering-the-search-response">
+<h2>Ordering the Search Response<a class="headerlink" href="#ordering-the-search-response" title="Permalink to this headline">¶</a></h2>
+<p>By default, searches return objects ordered on <code class="docutils literal notranslate"><span class="pre">id</span></code>, ascending. This behavior
+can be customized with the optional <code class="docutils literal notranslate"><span class="pre">order_by</span></code> argument.</p>
+<p>If you don’t have an <code class="docutils literal notranslate"><span class="pre">id</span></code> parameter for your database objects or you wish to
+sort by other fields, you should populate the <code class="docutils literal notranslate"><span class="pre">order_by</span></code> argument to the
+search function when you call it.</p>
+<p>This approach does not allow API consumers to set the order_by argument, but
+allows the developer to override the default id ordering.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/api/v1/pets/search&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">pet_search</span><span class="p">():</span>
+    <span class="n">pets</span> <span class="o">=</span> <span class="n">filtr</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">Pet</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filters&quot;</span><span class="p">),</span>
+                        <span class="n">PetSchema</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="n">Pet</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">pet_schema</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">pets</span><span class="p">)),</span> <span class="mi">200</span>
+</pre></div>
+</div>
+<p>Alternatively, if you wish to allow users to customize the order of the
+objects in the response, use a string for the <code class="docutils literal notranslate"><span class="pre">order_by</span></code> argument.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/api/v1/pets/search&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">pet_search</span><span class="p">():</span>
+    <span class="n">order_by</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orderBy&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;name&quot;</span>
+    <span class="n">pets</span> <span class="o">=</span> <span class="n">filtr</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">Pet</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filters&quot;</span><span class="p">),</span>
+                        <span class="n">PetSchema</span><span class="p">,</span> <span class="n">order_by</span><span class="o">=</span><span class="n">order_by</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">pet_schema</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">pets</span><span class="p">)),</span> <span class="mi">200</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -56,7 +123,11 @@
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-flaskfilter-extension">Using the FlaskFilter Extension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ordering-the-search-response">Ordering the Search Response</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">

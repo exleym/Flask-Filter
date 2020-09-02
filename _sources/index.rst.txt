@@ -16,13 +16,12 @@ into chained filters on a SQLAlchemy query. By leveraging the great work done
 by the SQLAlchemy and Marshmallow teams, we are able to easily provide a
 standardized search function to REST APIs.
 
-Welcome to the new age!
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    tutorial
+   dev-guide
 
 
 

@@ -15,7 +15,6 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Developer’s Guide" href="dev-guide.html" />
     <link rel="prev" title="Flask-Filter: A simple search extension" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -36,202 +35,6 @@
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
 <p>This will eventually be a tutorial for using Flask-Filter. Woot!</p>
-<div class="section" id="example-1-the-flaskfilter-extension">
-<h2>Example 1: The FlaskFilter Extension<a class="headerlink" href="#example-1-the-flaskfilter-extension" title="Permalink to this headline">¶</a></h2>
-<p>The simplest and most effective way to use this library is through the
-<code class="docutils literal notranslate"><span class="pre">FlaskFilter</span></code> extension. Instantiate this object as a singleton and
-register it with the <code class="docutils literal notranslate"><span class="pre">Flask</span></code> application object, and you can query
-resources with the <code class="docutils literal notranslate"><span class="pre">search</span></code> method from any view.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
-
-<span class="c1"># Pet Model defined as subclass of `db.Model`</span>
-<span class="kn">from</span> <span class="nn">pet_store</span> <span class="kn">import</span> <span class="n">Pet</span><span class="p">,</span> <span class="n">PetSchema</span>
-
-<span class="c1"># SQLAlchemy and FlaskFilter objects created as singletons</span>
-<span class="kn">from</span> <span class="nn">pet_store.extensions</span> <span class="kn">import</span> <span class="n">db</span><span class="p">,</span> <span class="n">filtr</span>
-
-<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">db</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
-<span class="n">filtr</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
-
-
-<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/api/v1/pets/search&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">]</span>
-<span class="k">def</span> <span class="nf">pet_search</span><span class="p">():</span>
-    <span class="n">pets</span> <span class="o">=</span> <span class="n">filtr</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">Pet</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filters&quot;</span><span class="p">),</span> <span class="n">PetSchema</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">pet_schema</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">pets</span><span class="p">)),</span> <span class="mi">200</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="example-2-preregistering-your-models">
-<h2>Example 2: Preregistering your Models<a class="headerlink" href="#example-2-preregistering-your-models" title="Permalink to this headline">¶</a></h2>
-<p>You can also pre-register your models and schemas with the <code class="docutils literal notranslate"><span class="pre">FlaskFilter</span></code>
-object, after which you will not need to pass the schema directly to the
-<code class="docutils literal notranslate"><span class="pre">search()</span></code> method. This feature could be helpful if you are attempting to
-auto-generate CRUD endpoints.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Register in the app factory</span>
-<span class="n">filtr</span><span class="o">.</span><span class="n">register_model</span><span class="p">(</span><span class="n">Dog</span><span class="p">,</span> <span class="n">DogSchema</span><span class="p">)</span>
-
-<span class="c1"># in some endpoint down the line, you can now search like this:</span>
-<span class="n">filters</span> <span class="o">=</span> <span class="n">filter_schema</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">json</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filters&quot;</span><span class="p">))</span>
-<span class="n">pets</span> <span class="o">=</span> <span class="n">filtr</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">Pet</span><span class="p">,</span> <span class="n">filters</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="example-3-automatic-code-generation">
-<h2>Example 3: Automatic Code Generation<a class="headerlink" href="#example-3-automatic-code-generation" title="Permalink to this headline">¶</a></h2>
-<p>If you are using Flask-Restplus to build resource-driven APIs, <code class="docutils literal notranslate"><span class="pre">Flask-Filter</span></code>
-allows you to automatically generate search endpoints and register them
-with your Swagger documentation:</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Note: this example is built with Flask-RestX and Flask-Accepts
-to pair Marshmallow directly with Flask-Restplus and avoid the
-duplication of serializers common with Flask-Restplus.</p>
-</div>
-<p>Use a simple search-endpoint factory function like this one to easily
-create search endpoints for all of your resources. Pair this with some
-other factory functions for a full auto-CRUD tool.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_search</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">Schema</span><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">filtr</span><span class="p">,</span>
-                    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; factory function for creating a Resource search Manager in</span>
-<span class="sd">    Flask-Restplus API application. Pass me an `api` object and a</span>
-<span class="sd">    Restplus resource namespace along with a Marshmallow Schema and</span>
-<span class="sd">    a SQLAlchemy model, and I will generate / register your search</span>
-<span class="sd">    endpoint.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">res_name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">Schema</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Schema&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="n">schema</span> <span class="o">=</span> <span class="n">Schema</span><span class="p">()</span>
-
-    <span class="nd">@namespace.route</span><span class="p">(</span><span class="s2">&quot;/search&quot;</span><span class="p">)</span>
-    <span class="k">class</span> <span class="nc">ResourceSearch</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
-
-        <span class="nd">@namespace.doc</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;execute a resource search for {res_name}&quot;</span><span class="p">)</span>
-        <span class="nd">@accepts</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="n">SearchSchema</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="n">api</span><span class="p">)</span>
-        <span class="nd">@responds</span><span class="p">(</span>
-            <span class="n">schema</span><span class="o">=</span><span class="n">Schema</span><span class="p">(</span><span class="n">many</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
-            <span class="n">status_code</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-            <span class="n">api</span><span class="o">=</span><span class="n">api</span>
-        <span class="p">)</span>
-        <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="n">filters</span> <span class="o">=</span> <span class="n">namespace</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filters&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">filtr</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
-                <span class="n">DbModel</span><span class="o">=</span><span class="n">Model</span><span class="p">,</span>
-                <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">,</span>
-                <span class="n">ModelSchema</span><span class="o">=</span><span class="n">schema</span>
-            <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">ResourceSearch</span>
-
-<span class="c1"># Now generate some search endpoints with this factory function</span>
-<span class="n">generate_search</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">ns_dogs</span><span class="p">,</span> <span class="n">DogSchema</span><span class="p">,</span> <span class="n">Dog</span><span class="p">,</span> <span class="n">filtr</span><span class="p">)</span>
-<span class="n">generate_search</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">ns_toys</span><span class="p">,</span> <span class="n">ToySchema</span><span class="p">,</span> <span class="n">Toy</span><span class="p">,</span> <span class="n">filtr</span><span class="p">)</span>
-<span class="n">generate_search</span><span class="p">(</span><span class="n">api</span><span class="p">,</span> <span class="n">ns_usr</span><span class="p">,</span> <span class="n">UserSchema</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">filtr</span><span class="p">)</span>
-</pre></div>
-</div>
-<img alt="_images/routes.png" src="_images/routes.png" />
-<p>The generate_search function shown above will register endpoints and
-document them in the swagger spec. If you click on the “search” endpoint
-in that image, you get the detailed documentation of your post request
-body.</p>
-<img alt="_images/routes-search.png" src="_images/routes-search.png" />
-</div>
-<div class="section" id="example-4-extending-flaskfilter-adding-a-new-filter">
-<h2>Example 4: Extending FlaskFilter – Adding a new Filter<a class="headerlink" href="#example-4-extending-flaskfilter-adding-a-new-filter" title="Permalink to this headline">¶</a></h2>
-<p>There may come a situation where the default filters provided by
-this library do not meet the needs of your application. In this
-event, you can extend the filter set provided by the <code class="docutils literal notranslate"><span class="pre">FlaskFilter</span></code>
-library and create your own filters that can be added to a search
-endpoint.</p>
-<p>The default filters provided in version 0.1 of this library are
-as follows:</p>
-<ul class="simple">
-<li>LTFilter</li>
-<li>LTEFilter</li>
-<li>EqualsFilter</li>
-<li>GTFilter</li>
-<li>GTEFilter</li>
-<li>InFilter</li>
-<li>NotEqualsFilter</li>
-<li>LikeFilter</li>
-<li>ContainsFilter</li>
-</ul>
-<p>These should cover most situations, but let’s imaging a business
-need for a search endpoint that allows users to query with a
-<code class="docutils literal notranslate"><span class="pre">NotInFilter</span></code> to complement the <code class="docutils literal notranslate"><span class="pre">InFilter</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flask_filter.filters.filters</span> <span class="kn">import</span> <span class="n">Filter</span>
-<span class="kn">from</span> <span class="nn">flask_filter.filters</span> <span class="kn">import</span> <span class="n">FILTERS</span>
-
-<span class="k">class</span> <span class="nc">NotInFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Custom not-in filter extending FlaskFilter search &quot;&quot;&quot;</span>
-    <span class="n">OP</span> <span class="o">=</span> <span class="s2">&quot;!in&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">class_</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_db_field</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span><span class="o">.</span><span class="n">notin_</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">_</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{self} must be an iterable&quot;</span><span class="p">)</span>
-
-<span class="n">FILTERS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NotInFilter</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>This implementation works fine, but let’s look at the similarities
-between what we just wrote and the existing InFilter – maybe we
-would be better off extending the InFilter to create a more easily
-maintained class:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">InFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-    <span class="n">OP</span> <span class="o">=</span> <span class="s2">&quot;in&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">class_</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_db_field</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">_</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{self} must be an iterable&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Whoops! There’s only a few tiny changes that had to be made to the
-existing InFilter. Looking closely the only things that differ are:</p>
-<ul class="simple">
-<li>the class name itself</li>
-<li>the <code class="docutils literal notranslate"><span class="pre">OP</span></code> class variable</li>
-<li>the filter used in the apply method</li>
-</ul>
-<p>This extension could be accomplished much more effectively by
-sub-classing the <code class="docutils literal notranslate"><span class="pre">InFilter</span></code> class.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NotInFilter</span><span class="p">(</span><span class="n">InFilter</span><span class="p">):</span>
-    <span class="n">OP</span> <span class="o">=</span> <span class="s2">&quot;!in&quot;</span>
-
-    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">class_</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_db_field</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
-            <span class="nb">getattr</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span><span class="o">.</span><span class="n">notin_</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
-        <span class="p">)</span>
-
-<span class="n">FILTERS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NotInFilter</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
 </div>
 
 
@@ -253,14 +56,7 @@ sub-classing the <code class="docutils literal notranslate"><span class="pre">In
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#example-1-the-flaskfilter-extension">Example 1: The FlaskFilter Extension</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-2-preregistering-your-models">Example 2: Preregistering your Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-3-automatic-code-generation">Example 3: Automatic Code Generation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#example-4-extending-flaskfilter-adding-a-new-filter">Example 4: Extending FlaskFilter – Adding a new Filter</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="dev-guide.html">Developer’s Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a></li>
 </ul>
 
 <div class="relations">
@@ -268,7 +64,6 @@ sub-classing the <code class="docutils literal notranslate"><span class="pre">In
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Flask-Filter: A simple search extension</a></li>
-      <li>Next: <a href="dev-guide.html" title="next chapter">Developer’s Guide</a></li>
   </ul></li>
 </ul>
 </div>

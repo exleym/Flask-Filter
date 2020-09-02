@@ -1,6 +1,10 @@
 # Flask-Filter
 Filtering Extension for Flask / SQLAlchemy
 
+Check out our
+[GitHub Pages site](https://exleym.github.io/Flask-Filter/) for the
+full documentation.
+
 [![Build Status](https://travis-ci.org/exleym/Flask-Filter.svg?branch=master)](https://travis-ci.org/exleym/Flask-Filter)
 [![Coverage Status](https://coveralls.io/repos/github/exleym/Flask-Filter/badge.svg?branch=master)](https://coveralls.io/github/exleym/Flask-Filter?branch=master)
 [![PyPi][pypi-badge]][pypi]
@@ -9,9 +13,7 @@ Flask-Filter is a simple [Flask](http://flask.pocoo.org/) extension for
 standardizing behavior of REST API resource search endpoints. It is
 designed to integrate with the [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
 extension and [Marshmallow](https://marshmallow.readthedocs.io/en/3.0/),
-a popular serialization library. Check out our
-[GitHub Pages site](https://exleym.github.io/Flask-Filter/) for the
-full documentation.
+a popular serialization library.
 
 Out-of-the-box, Flask-Filter provides search functionality on top-level
 object fields via an array of filter objects provided in the JSON body
@@ -114,7 +116,7 @@ db.init_app(app)
 filtr.init_app(app)
 
 
-@app.route('/api/v1/pets/search', methods=['POST']
+@app.route('/api/v1/pets/search', methods=['POST'])
 def pet_search():
     pets = filtr.search(Pet, request.json.get("filters"), PetSchema)
     return jsonify(pet_schema.dump(pets)), 200
@@ -133,6 +135,37 @@ followed by the search execution (without an explicitly-defined schema):
 ```python
 pets = filtr.search(Pet, request.json.get("filters"))
 ```
+
+### Example 4: Ordering Search Responses
+By default, searches return objects ordered on `id`, ascending. This behavior 
+can be customized with the optional `order_by` argument.
+
+If you don't have an `id` parameter for your database objects or you wish to 
+sort by other fields, you should populate the `order_by` argument to the search 
+function when you call it. 
+
+This approach does not allow API consumers to set the order_by argument, but 
+allows the developer to override the default id ordering.
+```python
+@app.route('/api/v1/pets/search', methods=['POST'])
+def pet_search():
+    pets = filtr.search(Pet, request.json.get("filters"), PetSchema,
+                        order_by=Pet.name)
+    return jsonify(pet_schema.dump(pets)), 200
+```
+
+Alternatively, if you wish to allow users to customize the order of the 
+objects in the response, use a string for the `order_by` argument.
+
+```python
+@app.route('/api/v1/pets/search', methods=['POST'])
+def pet_search():
+    order_by = json.get("orderBy") or "name"
+    pets = filtr.search(Pet, request.json.get("filters"), PetSchema,
+                        order_by=order_by)
+    return jsonify(pet_schema.dump(pets)), 200
+```
+
 
 [pypi-badge]: https://badge.fury.io/py/Flask-Filter.svg
 [pypi]: https://pypi.org/project/Flask-Filter/

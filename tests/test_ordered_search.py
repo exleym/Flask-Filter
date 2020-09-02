@@ -77,12 +77,30 @@ class FlaskFilterOrderTestClass(unittest.TestCase):
         self.assertEquals(len(dags), 5)
         self.assertListEqual([d.id for d in dags], expected_order)
 
+    def test_no_filter_order_by_name_as_string(self):
+        xfilters = []
+        expected_order = [2, 4, 5, 3, 1]
+        with self.app.app_context():
+            dags = self.filtr.search(Dog, xfilters, DogSchema,
+                                     order_by="name")
+        self.assertEquals(len(dags), 5)
+        self.assertListEqual([d.id for d in dags], expected_order)
+
     def test_no_filter_order_by_weight(self):
         xfilters = []
         expected_order = [2, 5, 4, 3, 1]
         with self.app.app_context():
             dags = self.filtr.search(Dog, xfilters, DogSchema,
                                      order_by=Dog.weight)
+        self.assertEquals(len(dags), 5)
+        self.assertListEqual([d.id for d in dags], expected_order)
+
+    def test_no_filter_order_by_weight_as_string(self):
+        xfilters = []
+        expected_order = [2, 5, 4, 3, 1]
+        with self.app.app_context():
+            dags = self.filtr.search(Dog, xfilters, DogSchema,
+                                     order_by="weight")
         self.assertEquals(len(dags), 5)
         self.assertListEqual([d.id for d in dags], expected_order)
 

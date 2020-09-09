@@ -22,6 +22,7 @@ standardized search function to REST APIs.
 
    tutorial
    dev-guide
+   changelog
 
 
 

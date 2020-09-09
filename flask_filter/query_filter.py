@@ -1,11 +1,8 @@
-from .schemas import FilterSchema
-
-
-filter_schema = FilterSchema()
+from .schemas import deserialize_filters
 
 
 def query_with_filters(class_, filters, schema=None, order_by=None):
-    _filters = filter_schema.load(filters, many=True)
+    _filters = deserialize_filters(filters, many=True)
     query = class_.query
     for f in _filters:
         query = f.apply(query, class_, schema)

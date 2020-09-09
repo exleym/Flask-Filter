@@ -2,8 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import Model
 from marshmallow import Schema
 from typing import Union
-
-from flask_filter.schemas import FilterSchema
+from flask_filter.schemas import deserialize_filters
 
 
 
@@ -12,7 +11,6 @@ class FlaskFilter(object):
 
     def __init__(self, app: Flask = None):
         self.app = app
-        self.schema = FilterSchema()
         if self.app:
             self.init_app(app)
 
@@ -26,7 +24,7 @@ class FlaskFilter(object):
     def search(self, DbModel: Model, filters: list,
                ModelSchema: Union[Schema, None] = None,
                limit: int = None, order_by=None):
-        filters = self.schema.load(filters, many=True)
+        filters = deserialize_filters(filters, many=True)
         schema = ModelSchema or self._lookup_schema(DbModel)
         query = DbModel.query
         for f in filters:

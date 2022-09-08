@@ -14,7 +14,7 @@ def _get_filter_class(operator):
     return __FILTER_MAP.get(operator)
 
 
-def vali1date_operator(value):
+def validate_operator(value):
     if value not in __VALID_OPERATORS:
         message = {'op': [f"operator {value} is not supported"]}
         raise ValidationError(message)
@@ -22,8 +22,8 @@ def vali1date_operator(value):
 
 class FilterSchema(ma.Schema):
     field = ma.fields.String(required=True, allow_none=False)
-    op = ma.fields.String(required=True, attribute="OP", validate=vali1date_operator)
-    value = ma.fields.Field(required=True, allow_none=False)
+    op = ma.fields.String(required=True, attribute="OP", validate=validate_operator)
+    value = ma.fields.Field(required=True, allow_none=True)
 
     @ma.post_load
     def make_object(self, json, *args, **kwargs):
@@ -44,8 +44,8 @@ def deserialize_filters(data, *args, **kwargs):
     """
     data = _schema.load(data, *args, **kwargs)
     if _mm2:
-        logger.warning(f"Marshmallow v2 is deprecated and will not be "
-                       f"supported in future versions of FlaskFilter. "
-                       f"Please upgrade to Marshmallow 3+")
+        logger.warning("Marshmallow v2 is deprecated and will not be "
+                       "supported in future versions of FlaskFilter. "
+                       "Please upgrade to Marshmallow 3+")
         data = data.data
     return data

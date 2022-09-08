@@ -15,7 +15,7 @@ idna==2.8
 imagesize==1.1.0
 importlib-metadata==0.23
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 MarkupSafe==1.1.0
 marshmallow==3.2.0
 marshmallow-sqlalchemy==0.15.0

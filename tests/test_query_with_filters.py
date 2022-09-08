@@ -27,7 +27,7 @@ class QueryWithFiltersTestClass(unittest.TestCase):
             Dog(name="Jasmine", dob=date(1997, 4, 20), weight=40),
             Dog(name="Quick", dob=date(2000, 5, 24), weight=90),
             Dog(name="Jinx", dob=date(2005, 12, 31), weight=55),
-            Dog(name="Kaya", dob=date(2009, 3, 15), weight=50)
+            Dog(name="Kaya", dob=None, weight=50)
         ]
         self.db.session.add_all(doggos)
         self.db.session.commit()
@@ -65,6 +65,19 @@ class QueryWithFiltersTestClass(unittest.TestCase):
         with self.app.app_context():
             old_dogs = query_with_filters(Dog, f, DogSchema)
         self.assertEqual(len(old_dogs), 3)
+
+    def test_dob_null_equalsfilter(self):
+        f = [{"field": "dateOfBirth", "op": "=", "value": None}]
+        with self.app.app_context():
+            kaya = query_with_filters(Dog, f, DogSchema)
+            self.assertEqual(len(kaya), 1)
+            self.assertEqual(kaya[0].name, "Kaya")
+
+    def test_dob_null_notequalsfilter(self):
+        f = [{"field": "dateOfBirth", "op": "!=", "value": None}]
+        with self.app.app_context():
+            not_kaya = query_with_filters(Dog, f, DogSchema)
+            self.assertEqual(len(not_kaya), 4)
 
     def test_weight_ltfilter(self):
         f = [{"field": "weight", "op": "<", "value": 50}]

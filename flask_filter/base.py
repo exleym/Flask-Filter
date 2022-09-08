@@ -5,7 +5,6 @@ from typing import Union
 from flask_filter.schemas import deserialize_filters
 
 
-
 class FlaskFilter(object):
     __SCHEMA_MAP = {}
 

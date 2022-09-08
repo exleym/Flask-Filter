@@ -121,7 +121,7 @@ class EqualsFilter(Filter):
         return query.filter(getattr(class_, field) == self.value)
 
     def is_valid(self):
-        allowed = (str, int, datetime.date)
+        allowed = (str, int, datetime.date, None.__class__)
         try:
             assert isinstance(self.value, allowed)
         except AssertionError:
@@ -155,8 +155,9 @@ class NotEqualsFilter(Filter):
         return query.filter(getattr(class_, field) != self.value)
 
     def is_valid(self):
+        allowed = (str, int, datetime.date, None.__class__)
         try:
-            assert type(self.value) in (str, int, datetime.date)
+            assert isinstance(self.value, allowed)
         except AssertionError:
             raise ValidationError(f"{self} requires a string or int value")
 

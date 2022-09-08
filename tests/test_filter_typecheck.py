@@ -115,6 +115,11 @@ class FilterSchemaTestClass(unittest.TestCase):
         eq = self.schema.load(json)
         self.assertIsInstance(eq, EqualsFilter)
 
+    def test_equalfilter_accepts_none(self):
+        json = {"field": "name", "op": "=", "value": None}
+        eq = self.schema.load(json)
+        self.assertIsInstance(eq, EqualsFilter)
+
     def test_equalsfilter_raises_validationerror_against_float(self):
         json = {"field": "weight", "op": "=", "value": 12.345}
         with self.assertRaises(ValidationError):
@@ -160,6 +165,11 @@ class FilterSchemaTestClass(unittest.TestCase):
 
     def test_notequalsfilter_accepts_date(self):
         json = {"field": "name", "op": "!=", "value": date(2018, 12, 16)}
+        notequalsfilter = self.schema.load(json)
+        self.assertIsInstance(notequalsfilter, NotEqualsFilter)
+
+    def test_notequalsfilter_accepts_none(self):
+        json = {"field": "name", "op": "!=", "value": None}
         notequalsfilter = self.schema.load(json)
         self.assertIsInstance(notequalsfilter, NotEqualsFilter)
 

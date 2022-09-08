@@ -2,10 +2,9 @@
 Filtering Extension for Flask / SQLAlchemy
 
 Check out our
-[GitHub Pages site](https://exleym.github.io/Flask-Filter/) for the
-full documentation.
+[GitHub Pages site](https://exleym.github.io/Flask-Filter/) for the full documentation.
 
-[![Build Status](https://travis-ci.org/exleym/Flask-Filter.svg?branch=master)](https://travis-ci.org/exleym/Flask-Filter)
+[![Python package](https://github.com/exleym/Flask-Filter/actions/workflows/python-package.yml/badge.svg)](https://github.com/exleym/Flask-Filter/actions/workflows/python-package.yml)
 [![Coverage Status](https://coveralls.io/repos/github/exleym/Flask-Filter/badge.svg?branch=master)](https://coveralls.io/github/exleym/Flask-Filter?branch=master)
 [![PyPi][pypi-badge]][pypi]
 

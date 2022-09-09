@@ -91,7 +91,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-venv-*/
+venv-3.10/
 
 # Spyder project settings
 .spyderproject

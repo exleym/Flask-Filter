@@ -1,5 +1,5 @@
 # Flask-Filter
-Filtering Extension for Flask / SQLAlchemy
+> Filtering Extension for Flask / SQLAlchemy
 
 Check out our
 [GitHub Pages site](https://exleym.github.io/Flask-Filter/) for the full documentation.

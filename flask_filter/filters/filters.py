@@ -9,7 +9,17 @@ from marshmallow.exceptions import ValidationError
 
 
 logger = logging.getLogger(__name__)
-RE_DATE = "^([0-9]{4})-([0-9]|1[0-2]|0[1-9])-([1-9]|0[1-9]|1[0-9]|2[1-9]|3[0-1])$"
+RE_DATE = "^([0-9]{4})-([0-9]|1[0-2]|0[1-9])-([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$"
+RE_DATETIME = "^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$"
+
+
+def is_date(value: str) -> bool:
+    return bool(re.match(RE_DATE, value))
+
+
+def is_datetime(value: str) -> bool:
+    return bool(re.match(RE_DATETIME, value))
+
 
 
 class Filter(abc.ABC):
@@ -66,9 +76,15 @@ class Filter(abc.ABC):
     def _date_or_value(self, value):
         if not isinstance(value, str):
             return value
-        if re.match(RE_DATE, value):
+        elif is_date(value):
             return datetime.datetime.strptime(value, "%Y-%m-%d").date()
+        elif is_datetime(value):
+            return self._parse_datetime(value)
         return value
+
+    def _parse_datetime(self, value: str):
+        dt = value.replace("Z", "+00:00")
+        return datetime.datetime.fromisoformat(dt)
 
 
 class RelativeComparator(Filter):
@@ -125,7 +141,7 @@ class EqualsFilter(Filter):
         try:
             assert isinstance(self.value, allowed)
         except AssertionError:
-            raise ValidationError(f"{self} requires a string or int value")
+            raise ValidationError(f"{self} requires a string, int, date or null value")
 
 
 class InFilter(Filter):
@@ -159,7 +175,7 @@ class NotEqualsFilter(Filter):
         try:
             assert isinstance(self.value, allowed)
         except AssertionError:
-            raise ValidationError(f"{self} requires a string or int value")
+            raise ValidationError(f"{self} requires a string, int, date or null value")
 
 
 class LikeFilter(Filter):

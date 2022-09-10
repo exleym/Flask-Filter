@@ -32,6 +32,7 @@ class Dog(db.Model):
     name = db.Column(db.String, unique=True)
     dob = db.Column(db.Date)
     weight = db.Column(db.Float)
+    created = db.Column(db.DateTime, default=datetime.datetime.utcnow())
 
     toys = db.relationship("Toy", secondary="dog_toys", backref="dogs")
 
@@ -48,6 +49,7 @@ class DogSchema(Schema):
     name = fields.String()
     dateOfBirth = fields.Date(attribute='dob')
     weight = fields.Float()
+    created = fields.AwareDateTime()
     toys = fields.List(fields.Nested("ToySchema"))
 
 
